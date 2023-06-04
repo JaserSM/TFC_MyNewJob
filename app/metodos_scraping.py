@@ -152,11 +152,12 @@ def scraping_indeed(options, keywords):
 
 
 def scraping_tecnoempleo(options, keywords):
-    str_salary = None
-    ubicacion = None
-    contrato = None
-    experiencia = None
     for WORD in keywords:
+        str_salary = ''
+        ubicacion = None
+        contrato = None
+        experiencia = None
+
         driver = webdriver.Chrome(options=options)
         driver.get("https://www.tecnoempleo.com/")
 
@@ -319,7 +320,7 @@ def scraping_tecnoempleo(options, keywords):
             job.position = job.position
             job.offer_date = job.offer_date
             job.scraping_date = datetime.now()
-            if str_salary != None:
+            if str_salary != None and str_salary != '':
                 job.salary = str_salary
             if ubicacion != None:
                 job.location = ubicacion
@@ -334,189 +335,193 @@ def scraping_tecnoempleo(options, keywords):
 
 
 def scraping_infoempleo(options, keywords):
-    portal_empleo_list = list()
-    link_list = list()
-    cargo_list = list()
-    experiencia_list = list()
-    fecha_list = list()
-    empresa_list = list()
-    empresa_link_list = list()
-    ubicacion_list = list()
-    salario_list = list()
-    contrato_list = list()
-    requisitos_list = list()
-    descripcion_list = list()
+    for WORD in keywords:
+        portal_empleo_list = list()
+        link_list = list()
+        cargo_list = list()
+        experiencia_list = list()
+        fecha_list = list()
+        empresa_list = list()
+        empresa_link_list = list()
+        ubicacion_list = list()
+        salario_list = list()
+        contrato_list = list()
+        requisitos_list = list()
+        descripcion_list = list()
 
 
-    driver = webdriver.Chrome(options=options)
-    driver.get("https://www.infoempleo.com/")
-    time.sleep(6)
-    # REALIZAMOS LA BÚSQUEDA
-    input_search = driver.find_element(By.XPATH,
-                                       "/html/body//div[@class='header-rest']//input[@name='search']")
-    input_search.send_keys(keywords[0])
-    time.sleep(4)
-    input_search.send_keys(Keys.ENTER)
-    time.sleep(6)
-
-    # botonCookies
-    driver.find_element(By.XPATH,
-                        "/html/body//div[@id='onetrust-button-group']//button[@id='onetrust-accept-btn-handler']").click()
-
-    time.sleep(2)
-    # mensaje recibir ofertas
-    try:
-        driver.find_element(By.XPATH,
-                            "/html/body//div[@id='lightbox-wrapper']//span[@class='close']").click()
-    except:
-        pass
-
-    time.sleep(2)
-    container = driver.find_element(By.XPATH, "/html/body//div[@class='sticky-container sticky']")
-    time.sleep(1)
-
-    lista_ofertas = container.find_elements(By.XPATH, "./ul/li")
-    time.sleep(1)
-
-    contador = 1
-    for oferta in lista_ofertas:
-        time.sleep(2)
-        try:
-            print('\n---- OFERTA: ', contador, '----')
-            print(oferta.text)
-            print('UBICACIÓN: ', oferta.text.split('\n')[2])
-            ubicacion = oferta.text.split('\n')[2]
-            contador += 1
-            print(oferta.get_attribute('id'))
-            driver.execute_script("arguments[0].scrollIntoView();", oferta)
-            #time.sleep(1)
-            title = oferta.find_element(By.XPATH, "./h2[@class='title']")
-
-            print(title.text)
-            cargo_list.append(title.text)
-            #time.sleep(1)
-
-            link = title.find_element(By.XPATH, "./a").get_attribute('href')
-            print(link)
-            link_list.append(link)
-            #time.sleep(1)
-            link = link.split('infoempleo.com/ofertasdetrabajo/')[1]
-            print(link)
-
-            empresa = oferta.find_element(By.XPATH, "./p[@class='block']").text
-            print(empresa)
-            #time.sleep(1)
-
-            company = Company(name=empresa)
-            print(company)
-            company_id = insert_company(company)
-            #time.sleep(1)
-
-            myDate = datetime.now()
-            print(myDate)
-            #time.sleep(1)
-
-            horas = oferta.find_element(By.XPATH, "./p[@class='block'][2]").text
-            print(horas)
-            #time.sleep(1)
-            horas = horas.split(' ')[1]
-            print(horas)
-
-            """myDate = datetime.now()
-            result = (myDate.hour - int(horas))
-            if 0 > result > (-24):
-                myDate = myDate.replace(day=(myDate.day - 1))
-            elif -24 > result > (-48):
-                myDate = myDate.replace(day=(myDate.day - 2))
-            elif -48 > result > (-72):
-                myDate = myDate.replace(day=(myDate.day - 3))
-            else:
-                myDate = myDate.replace(day=(myDate.day - 4))"""
-
-            myDate = datetime.now()
-            if int(horas) > myDate.hour:
-                newHoras = int(horas) - myDate.hour
-                contador_dias = 1
-                while newHoras >= 24:
-                    newHoras -= 24
-                    contador_dias += 1
-                HoraFinal = 24 - newHoras
-                myDate = myDate.replace(hour=HoraFinal)
-                myDate = myDate.replace(day=(myDate.day - contador_dias))
-            else:
-                myDate = myDate.replace(hour=(myDate.hour - int(horas)))
-                
-            print(myDate)
-            time.sleep(1)
-
-            job = JobOffer(link=link, web=1, company=company_id, position=title.text, offer_date=myDate, location=ubicacion)
-            print(job)
-            insert_job(job)
-        except Exception as ex:
-            print(ex)
-
-    time.sleep(6)
-    for link in link_list:
-        experiencia = None
-        descripcion = None
-        salario = ''
-        contrato = None
-
-        driver.get(link)
+        driver = webdriver.Chrome(options=options)
+        driver.get("https://www.infoempleo.com/")
+        time.sleep(6)
+        # REALIZAMOS LA BÚSQUEDA
+        input_search = driver.find_element(By.XPATH,
+                                           "/html/body//div[@class='header-rest']//input[@name='search']")
+        input_search.send_keys(WORD)
+        time.sleep(4)
+        input_search.send_keys(Keys.ENTER)
         time.sleep(6)
 
-        print('\n OFERTA:')
-        ul_list = driver.find_elements(By.XPATH, "//div[@class='offer-excerpt']/ul")
+        # botonCookies
+        driver.find_element(By.XPATH,
+                            "/html/body//div[@id='onetrust-button-group']//button[@id='onetrust-accept-btn-handler']").click()
 
-        cont = 1
-        for ul in ul_list:
-            li_list = ul.find_elements(By.XPATH, "./li")
-
-            for li in li_list:
-                h3 = li.find_element(By.XPATH, "./h3").text
-                print(h3)
-                p = li.find_element(By.XPATH, "./p").text
-                print(p)
-                if h3 == 'Experiencia':
-                    for c in p:
-                        if c.isdigit():
-                            experiencia = int(c)
-                            break
-                elif h3 == 'Salario':
-                    digitos = False
-                    for _s in p:
-                        print(_s)
-                        if _s.isdigit():
-                            salario += str(_s)
-                            digitos = True
-                        else:
-                            if _s != '.' and digitos == True:
-                                break
-                    print(' --- SALARIO: ', salario)
-                elif h3 == 'Contrato':
-                    contrato = p
-
-        descripcion = driver.find_element(By.XPATH, "//div[@class='offer']").text
-        print(descripcion)
-
-        url = link.split('infoempleo.com/ofertasdetrabajo/')[1]
-        job = getJobByLink(url)
-
-        if salario != None and salario != '':
-            job.salary = salario
-        if contrato != None:
-            job.contract = contrato
-        if experiencia != None:
-            job.experience = experiencia
-        if descripcion != None:
-            job.description = descripcion
-
-        print(job)
-        insert_job(job)
         time.sleep(2)
+        # mensaje recibir ofertas
+        try:
+            driver.find_element(By.XPATH,
+                                "/html/body//div[@id='lightbox-wrapper']//span[@class='close']").click()
+        except:
+            pass
+
+        time.sleep(2)
+        container = driver.find_element(By.XPATH, "/html/body//div[@class='sticky-container sticky']")
+        time.sleep(1)
+
+        lista_ofertas = container.find_elements(By.XPATH, "./ul/li")
+        time.sleep(1)
+
+        contador = 1
+        for oferta in lista_ofertas:
+            time.sleep(2)
+            try:
+                print('\n---- OFERTA: ', contador, '----')
+                print(oferta.text)
+                print('UBICACIÓN: ', oferta.text.split('\n')[2])
+                ubicacion = oferta.text.split('\n')[2]
+                contador += 1
+                print(oferta.get_attribute('id'))
+                driver.execute_script("arguments[0].scrollIntoView();", oferta)
+                #time.sleep(1)
+                title = oferta.find_element(By.XPATH, "./h2[@class='title']")
+
+                print(title.text)
+                cargo_list.append(title.text)
+                #time.sleep(1)
+
+                link = title.find_element(By.XPATH, "./a").get_attribute('href')
+                print(link)
+                link_list.append(link)
+                #time.sleep(1)
+                link = link.split('infoempleo.com/ofertasdetrabajo/')[1]
+                print(link)
+
+                empresa = oferta.find_element(By.XPATH, "./p[@class='block']").text
+                print(empresa)
+                #time.sleep(1)
+
+                company = Company(name=empresa)
+                print(company)
+                company_id = insert_company(company)
+                #time.sleep(1)
+
+                myDate = datetime.now()
+                print(myDate)
+                #time.sleep(1)
+
+                horas = oferta.find_element(By.XPATH, "./p[@class='block'][2]").text
+                print(horas)
+                #time.sleep(1)
+                horas = horas.split(' ')[1]
+                print(horas)
+
+                """myDate = datetime.now()
+                result = (myDate.hour - int(horas))
+                if 0 > result > (-24):
+                    myDate = myDate.replace(day=(myDate.day - 1))
+                elif -24 > result > (-48):
+                    myDate = myDate.replace(day=(myDate.day - 2))
+                elif -48 > result > (-72):
+                    myDate = myDate.replace(day=(myDate.day - 3))
+                else:
+                    myDate = myDate.replace(day=(myDate.day - 4))"""
+
+                myDate = datetime.now()
+                if int(horas) > myDate.hour:
+                    newHoras = int(horas) - myDate.hour
+                    contador_dias = 1
+                    while newHoras >= 24:
+                        newHoras -= 24
+                        contador_dias += 1
+                    HoraFinal = 24 - newHoras
+                    myDate = myDate.replace(hour=HoraFinal)
+                    myDate = myDate.replace(day=(myDate.day - contador_dias))
+                else:
+                    myDate = myDate.replace(hour=(myDate.hour - int(horas)))
+
+                print(myDate)
+                time.sleep(1)
+
+                job = JobOffer(link=link, web=1, company=company_id, position=title.text, offer_date=myDate, location=ubicacion)
+                print(job)
+                insert_job(job)
+            except Exception as ex:
+                print(ex)
+
+        time.sleep(6)
+        for link in link_list:
+            experiencia = None
+            descripcion = None
+            salario = ''
+            contrato = None
+
+            driver.get(link)
+            time.sleep(6)
+
+            print('\n OFERTA:')
+            ul_list = driver.find_elements(By.XPATH, "//div[@class='offer-excerpt']/ul")
+
+            cont = 1
+            for ul in ul_list:
+                li_list = ul.find_elements(By.XPATH, "./li")
+
+                for li in li_list:
+                    try:
+                        h3 = li.find_element(By.XPATH, "./h3").text
+                        print('# - ', h3)
+                        p = li.find_element(By.XPATH, ".//p").text
+                        print(p)
+                        if h3 == 'Experiencia':
+                            for c in p:
+                                if c.isdigit():
+                                    experiencia = int(c)
+                                    break
+                        elif h3 == 'Salario':
+                            digitos = False
+                            for _s in p:
+                                # print(_s)
+                                if _s.isdigit():
+                                    salario += str(_s)
+                                    digitos = True
+                                else:
+                                    if _s != '.' and digitos == True:
+                                        break
+                            print(' --- SALARIO: ', salario)
+                        elif h3 == 'Contrato':
+                            contrato = p
+                    except:
+                        pass
+
+            descripcion = driver.find_element(By.XPATH, "//div[@class='offer']").text
+            print(descripcion)
+
+            url = link.split('infoempleo.com/ofertasdetrabajo/')[1]
+            job = getJobByLink(url)
+
+            if salario != None and salario != '':
+                job.salary = salario
+            if contrato != None:
+                job.contract = contrato
+            if experiencia != None:
+                job.experience = experiencia
+            if descripcion != None:
+                job.description = descripcion
+
+            print(job)
+            insert_job(job)
+            time.sleep(2)
 
 
-    # OBTENEMOS LOS RESULTADOS
+        # OBTENEMOS LOS RESULTADOS
 
 
 def scraping_infojobs(options, keywords):

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from selenium.webdriver.chrome.options import Options
-from metodos_scraping import scraping_infoempleo
+from metodos_scraping import scraping_infoempleo, scraping_tecnoempleo
 import os
 
 
 absolute_path = os.path.dirname(__file__)
-relative_path_2 = './ConfigScraping.txt'
+relative_path_2 = 'configs/ConfigScraping.txt'
 configScraping = os.path.join(absolute_path, relative_path_2)
 
 def visibility():
@@ -45,9 +45,12 @@ print('VISIBILITY: ', VISIBLE)
 print('KEYWORDS: ', KEYWORDS)
 
 options = Options()
-#options.add_experimental_option('detach', True)
-options.add_argument("start-maximized")
-#options.add_argument('--headless') # ACTIVAR PARA NO VER EL PROCESO DE SCRAPING
+
+if VISIBLE:
+    options.add_argument("start-maximized")
+else:
+    #options.add_experimental_option('detach', True)
+    options.add_argument('--headless') # ACTIVAR PARA NO VER EL PROCESO DE SCRAPING
 
 
 print(KEYWORDS)
@@ -55,8 +58,15 @@ print(KEYWORDS)
 if len(KEYWORDS)>0:
 
     #scraping_indeed(options, KEYWORDS)
-    #scraping_tecnoempleo(options, KEYWORDS)
-    scraping_infoempleo(options, KEYWORDS)
+    try:
+        scraping_infoempleo(options, KEYWORDS)
+    except Exception as ex:
+        print(ex)
+
+    try:
+        scraping_tecnoempleo(options, KEYWORDS)
+    except Exception as ex:
+        print(ex)
     #scraping_infojobs(options, KEYWORDS)
 
 
