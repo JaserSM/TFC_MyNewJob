@@ -1,0 +1,8 @@
+html, body {
+  display: flex;
+  flex-direction: column;
+  padding-top: 50px;
+  margin: auto;
+  background-color: #242424;
+  color: azure;
+}
