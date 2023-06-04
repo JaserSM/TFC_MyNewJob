@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 import os
 
 absolute_path = os.path.dirname(__file__)
-relative_path_1 = './ConfigDB.txt'
+relative_path_1 = 'configs/ConfigDB.txt'
 configDB = os.path.join(absolute_path, relative_path_1)
 
 def user():
